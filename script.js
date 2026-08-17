@@ -194,3 +194,42 @@ downloadButton.addEventListener("click", function () {
     );
 
 });
+// ============================================
+// APPS SCRIPT CONNECTION TEST
+// ============================================
+
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKSFsA3BE2iCHANGAQ1cWceucmNtIj6xBpDKHJte71_RvKzeL-BJkJZwRGklySTkyAOQ/exec";
+
+
+async function testAppsScriptConnection() {
+
+  try {
+
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      redirect: "follow",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: "connection_test"
+    });
+
+
+    const result = await response.text();
+
+    console.log("Apps Script response:", result);
+
+    alert("Apps Script connection successful!");
+
+  } catch (error) {
+
+    console.error("Apps Script connection error:", error);
+
+    alert(
+      "Apps Script connection failed.\n\n" +
+      error.message
+    );
+
+  }
+
+}
