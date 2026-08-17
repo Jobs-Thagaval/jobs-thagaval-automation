@@ -201,35 +201,142 @@ downloadButton.addEventListener("click", function () {
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKSFsA3BE2iCHANGAQ1cWceucmNtIj6xBpDKHJte71_RvKzeL-BJkJZwRGklySTkyAOQ/exec";
 
 
-async function testAppsScriptConnection() {
+// ============================================
+// REAL FILE UPLOAD TO GOOGLE DRIVE
+// ============================================
 
-  try {
+async function uploadFileToDrive(file) {
 
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      redirect: "follow",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: "connection_test"
-    });
+    try {
+
+        console.log("Starting upload...");
+        console.log("File name:", file.name);
+        console.log("File type:", file.type);
+        console.log("File size:", file.size);
 
 
-    const result = await response.text();
+        // Read the selected file
+        const reader = new FileReader();
 
-    console.log("Apps Script response:", result);
 
-    alert("Apps Script connection successful!");
+        reader.onload = async function () {
 
-  } catch (error) {
+            try {
 
-    console.error("Apps Script connection error:", error);
+                // FileReader gives us:
+                // data:application/pdf;base64,XXXXXXXX
 
-    alert(
-      "Apps Script connection failed.\n\n" +
-      error.message
-    );
+                const base64Data =
+                    reader.result.split(",")[1];
 
-  }
+
+                // Prepare the data for Apps Script
+                const uploadData = {
+
+                    fileName: file.name,
+
+                    mimeType: file.type,
+
+                    fileData: base64Data
+
+                };
+
+
+                console.log("Sending file to Apps Script...");
+
+
+                // Send file to Apps Script
+                const response = await fetch(
+                    APPS_SCRIPT_URL,
+                    {
+
+                        method: "POST",
+
+                        redirect: "follow",
+
+                        headers: {
+
+                            "Content-Type":
+                                "text/plain;charset=utf-8"
+
+                        },
+
+                        body: JSON.stringify(uploadData)
+
+                    }
+                );
+
+
+                // Read Apps Script response
+                const result =
+                    await response.text();
+
+
+                console.log(
+                    "Apps Script response:",
+                    result
+                );
+
+
+                // Convert response into JSON
+                const data =
+                    JSON.parse(result);
+
+
+                if (data.success) {
+
+                    alert(
+                        "File uploaded successfully!"
+                    );
+
+                    console.log(
+                        "Uploaded file:",
+                        data
+                    );
+
+                } else {
+
+                    alert(
+                        "Upload failed:\n" +
+                        data.message
+                    );
+
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    "Upload processing error:",
+                    error
+                );
+
+                alert(
+                    "Upload failed.\n\n" +
+                    error.message
+                );
+
+            }
+
+        };
+
+
+        // Start reading the file
+        reader.readAsDataURL(file);
+
+
+    } catch (error) {
+
+        console.error(
+            "File upload error:",
+            error
+        );
+
+        alert(
+            "Unable to upload file.\n\n" +
+            error.message
+        );
+
+    }
 
 }
