@@ -128,17 +128,118 @@ fileInput.addEventListener("change", function () {
 
 /* =====================================================
    CONTINUE BUTTON
-   NOTE:
-   We are NOT connecting the real upload here yet.
+   REAL UPLOAD → PROCESSING
 ===================================================== */
 
-continueButton.addEventListener("click", function () {
+continueButton.addEventListener("click", async function () {
 
-    uploadSection.classList.add("hidden");
+    /* ---------------------------------------------
+       CHECK FILE
+    --------------------------------------------- */
 
-    processingSection.classList.remove("hidden");
+    const file = fileInput.files[0];
 
-    startProcessing();
+    if (!file) {
+
+        alert(
+            "Please select a PDF or image first."
+        );
+
+        return;
+
+    }
+
+
+    /* ---------------------------------------------
+       DISABLE BUTTON DURING UPLOAD
+    --------------------------------------------- */
+
+    continueButton.disabled = true;
+
+    continueButton.textContent =
+        "Uploading...";
+
+
+    try {
+
+        /* -----------------------------------------
+           UPLOAD FILE TO GOOGLE DRIVE
+        ----------------------------------------- */
+
+        const result =
+            await uploadFileToDrive(file);
+
+
+        /* -----------------------------------------
+           CHECK UPLOAD RESULT
+        ----------------------------------------- */
+
+        if (!result || !result.success) {
+
+            throw new Error(
+                "File upload was not successful."
+            );
+
+        }
+
+
+        /* -----------------------------------------
+           UPLOAD SUCCESSFUL
+        ----------------------------------------- */
+
+        console.log(
+            "Continue upload successful:",
+            result
+        );
+
+
+        /* -----------------------------------------
+           HIDE UPLOAD SECTION
+        ----------------------------------------- */
+
+        uploadSection.classList.add("hidden");
+
+
+        /* -----------------------------------------
+           SHOW PROCESSING SECTION
+        ----------------------------------------- */
+
+        processingSection.classList.remove("hidden");
+
+
+        /* -----------------------------------------
+           START PROCESSING
+        ----------------------------------------- */
+
+        startProcessing();
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Continue upload error:",
+            error
+        );
+
+
+        alert(
+            "File upload failed.\n\n" +
+            error.message
+        );
+
+
+        /* -----------------------------------------
+           RESTORE BUTTON
+        ----------------------------------------- */
+
+        continueButton.disabled = false;
+
+        continueButton.textContent =
+            "Continue →";
+
+    }
 
 });
 
