@@ -1,4 +1,5 @@
-const fileInput = document.getElementById("fileInput");
+const fileInput =
+    document.getElementById("fileInput");
 
 const previewSection =
     document.getElementById("previewSection");
@@ -24,10 +25,21 @@ const downloadSection =
 const downloadButton =
     document.getElementById("downloadButton");
 
+const testUploadButton =
+    document.getElementById("testUploadButton");
 
-/* --------------------------------
+
+/* =====================================================
+   APPS SCRIPT WEB APP URL
+===================================================== */
+
+const APPS_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbxKSFsA3BE2iCHANGAQ1cWceucmNtIj6xBpDKHJte71_RvKzeL-BJkJZwRGklySTkyAOQ/exec";
+
+
+/* =====================================================
    FILE SELECTION
--------------------------------- */
+===================================================== */
 
 fileInput.addEventListener("change", function () {
 
@@ -37,55 +49,88 @@ fileInput.addEventListener("change", function () {
         return;
     }
 
+
+    /* FILE NAME */
+
     fileName.textContent = file.name;
+
+
+    /* CLEAR OLD PREVIEW */
 
     previewContainer.innerHTML = "";
 
-    const fileURL = URL.createObjectURL(file);
+
+    /* CREATE TEMPORARY FILE URL */
+
+    const fileURL =
+        URL.createObjectURL(file);
 
 
-    /* IMAGE PREVIEW */
+    /* =================================================
+       IMAGE PREVIEW
+    ================================================= */
 
     if (file.type.startsWith("image/")) {
 
-        const image = document.createElement("img");
+        const image =
+            document.createElement("img");
 
         image.src = fileURL;
 
-        image.alt = "Uploaded Job Notification";
+        image.alt =
+            "Uploaded Job Notification";
 
         previewContainer.appendChild(image);
 
     }
 
 
-    /* PDF PREVIEW */
+    /* =================================================
+       PDF PREVIEW
+    ================================================= */
 
     else if (file.type === "application/pdf") {
 
-        const iframe = document.createElement("iframe");
+        const iframe =
+            document.createElement("iframe");
 
         iframe.src = fileURL;
 
-        iframe.title = "PDF Preview";
+        iframe.title =
+            "PDF Preview";
 
         previewContainer.appendChild(iframe);
 
     }
 
 
-    /* SHOW PREVIEW */
+    /* =================================================
+       SHOW PREVIEW
+    ================================================= */
 
     previewSection.classList.remove("hidden");
 
     continueButton.disabled = false;
-document.getElementById("testUploadButton").disabled = false;
+
+
+    /* =================================================
+       ENABLE TEMPORARY UPLOAD TEST BUTTON
+    ================================================= */
+
+    if (testUploadButton) {
+
+        testUploadButton.disabled = false;
+
+    }
+
 });
 
 
-/* --------------------------------
+/* =====================================================
    CONTINUE BUTTON
--------------------------------- */
+   NOTE:
+   We are NOT connecting the real upload here yet.
+===================================================== */
 
 continueButton.addEventListener("click", function () {
 
@@ -98,17 +143,19 @@ continueButton.addEventListener("click", function () {
 });
 
 
-/* --------------------------------
+/* =====================================================
    PROCESSING SIMULATION
--------------------------------- */
+===================================================== */
 
 function startProcessing() {
 
     activateStep(1);
 
+
     setTimeout(function () {
 
         completeStep(1);
+
         activateStep(2);
 
     }, 2000);
@@ -117,6 +164,7 @@ function startProcessing() {
     setTimeout(function () {
 
         completeStep(2);
+
         activateStep(3);
 
     }, 4000);
@@ -125,6 +173,7 @@ function startProcessing() {
     setTimeout(function () {
 
         completeStep(3);
+
         activateStep(4);
 
         downloadSection.classList.remove("hidden");
@@ -148,32 +197,37 @@ function startProcessing() {
 }
 
 
-/* --------------------------------
-   ACTIVATE STEP
--------------------------------- */
+/* =====================================================
+   ACTIVATE PROCESSING STEP
+===================================================== */
 
 function activateStep(stepNumber) {
 
     const step =
-        document.getElementById("step" + stepNumber);
+        document.getElementById(
+            "step" + stepNumber
+        );
 
     step.classList.add("active");
 
 }
 
 
-/* --------------------------------
-   COMPLETE STEP
--------------------------------- */
+/* =====================================================
+   COMPLETE PROCESSING STEP
+===================================================== */
 
 function completeStep(stepNumber) {
 
     const step =
-        document.getElementById("step" + stepNumber);
+        document.getElementById(
+            "step" + stepNumber
+        );
 
     step.classList.remove("active");
 
     step.classList.add("completed");
+
 
     const icon =
         step.querySelector(".status-icon");
@@ -183,9 +237,9 @@ function completeStep(stepNumber) {
 }
 
 
-/* --------------------------------
+/* =====================================================
    DOWNLOAD BUTTON
--------------------------------- */
+===================================================== */
 
 downloadButton.addEventListener("click", function () {
 
@@ -194,173 +248,258 @@ downloadButton.addEventListener("click", function () {
     );
 
 });
-// ============================================
-// APPS SCRIPT CONNECTION TEST
-// ============================================
-
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKSFsA3BE2iCHANGAQ1cWceucmNtIj6xBpDKHJte71_RvKzeL-BJkJZwRGklySTkyAOQ/exec";
 
 
-// ============================================
-// REAL FILE UPLOAD TO GOOGLE DRIVE
-// ============================================
+/* =====================================================
+   REAL FILE UPLOAD TO GOOGLE DRIVE
+===================================================== */
 
 async function uploadFileToDrive(file) {
 
+    console.log(
+        "Starting upload..."
+    );
+
+    console.log(
+        "File name:",
+        file.name
+    );
+
+    console.log(
+        "File type:",
+        file.type
+    );
+
+    console.log(
+        "File size:",
+        file.size
+    );
+
+
     try {
 
-        console.log("Starting upload...");
-        console.log("File name:", file.name);
-        console.log("File type:", file.type);
-        console.log("File size:", file.size);
+        /* ---------------------------------------------
+           READ FILE
+        --------------------------------------------- */
+
+        const base64Data =
+            await readFileAsBase64(file);
 
 
-        // Read the selected file
-        const reader = new FileReader();
+        console.log(
+            "File converted to Base64."
+        );
 
 
-        reader.onload = async function () {
+        /* ---------------------------------------------
+           PREPARE DATA
+        --------------------------------------------- */
 
-            try {
+        const uploadData = {
 
-                // FileReader gives us:
-                // data:application/pdf;base64,XXXXXXXX
+            fileName: file.name,
 
-                const base64Data =
-                    reader.result.split(",")[1];
+            mimeType: file.type,
 
-
-                // Prepare the data for Apps Script
-                const uploadData = {
-
-                    fileName: file.name,
-
-                    mimeType: file.type,
-
-                    fileData: base64Data
-
-                };
-
-
-                console.log("Sending file to Apps Script...");
-
-
-                // Send file to Apps Script
-                const response = await fetch(
-                    APPS_SCRIPT_URL,
-                    {
-
-                        method: "POST",
-
-                        redirect: "follow",
-
-                        headers: {
-
-                            "Content-Type":
-                                "text/plain;charset=utf-8"
-
-                        },
-
-                        body: JSON.stringify(uploadData)
-
-                    }
-                );
-
-
-                // Read Apps Script response
-                const result =
-                    await response.text();
-
-
-                console.log(
-                    "Apps Script response:",
-                    result
-                );
-
-
-                // Convert response into JSON
-                const data =
-                    JSON.parse(result);
-
-
-                if (data.success) {
-
-                    alert(
-                        "File uploaded successfully!"
-                    );
-
-                    console.log(
-                        "Uploaded file:",
-                        data
-                    );
-
-                } else {
-
-                    alert(
-                        "Upload failed:\n" +
-                        data.message
-                    );
-
-                }
-
-
-            } catch (error) {
-
-                console.error(
-                    "Upload processing error:",
-                    error
-                );
-
-                alert(
-                    "Upload failed.\n\n" +
-                    error.message
-                );
-
-            }
+            fileData: base64Data
 
         };
 
 
-        // Start reading the file
-        reader.readAsDataURL(file);
+        console.log(
+            "Sending file to Apps Script..."
+        );
 
 
-    } catch (error) {
+        /* ---------------------------------------------
+           SEND TO APPS SCRIPT
+        --------------------------------------------- */
+
+        const response =
+            await fetch(
+                APPS_SCRIPT_URL,
+                {
+
+                    method: "POST",
+
+                    redirect: "follow",
+
+                    headers: {
+
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+
+                    },
+
+                    body:
+                        JSON.stringify(uploadData)
+
+                }
+            );
+
+
+        /* ---------------------------------------------
+           READ RESPONSE
+        --------------------------------------------- */
+
+        const result =
+            await response.text();
+
+
+        console.log(
+            "Apps Script response:",
+            result
+        );
+
+
+        /* ---------------------------------------------
+           CONVERT RESPONSE TO JSON
+        --------------------------------------------- */
+
+        const data =
+            JSON.parse(result);
+
+
+        /* ---------------------------------------------
+           CHECK RESULT
+        --------------------------------------------- */
+
+        if (data.success) {
+
+            console.log(
+                "Upload successful!",
+                data
+            );
+
+            alert(
+                "File uploaded successfully!"
+            );
+
+            return data;
+
+        }
+
+
+        else {
+
+            throw new Error(
+                data.message ||
+                "File upload failed."
+            );
+
+        }
+
+
+    }
+
+    catch (error) {
 
         console.error(
-            "File upload error:",
+            "Upload error:",
             error
         );
 
+
         alert(
-            "Unable to upload file.\n\n" +
+            "Upload failed.\n\n" +
             error.message
         );
+
+
+        throw error;
 
     }
 
 }
-// ============================================
-// TEMPORARY REAL UPLOAD TEST
-// ============================================
+
+
+/* =====================================================
+   READ FILE AS BASE64
+===================================================== */
+
+function readFileAsBase64(file) {
+
+    return new Promise(
+        function (resolve, reject) {
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload = function () {
+
+                try {
+
+                    /*
+                     * FileReader result:
+                     *
+                     * data:application/pdf;base64,XXXXXX
+                     *
+                     * We only need the Base64 portion.
+                     */
+
+                    const base64Data =
+                        reader.result
+                            .split(",")[1];
+
+
+                    resolve(
+                        base64Data
+                    );
+
+                }
+
+                catch (error) {
+
+                    reject(error);
+
+                }
+
+            };
+
+
+            reader.onerror = function () {
+
+                reject(
+                    new Error(
+                        "Unable to read the selected file."
+                    )
+                );
+
+            };
+
+
+            reader.readAsDataURL(file);
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   TEMPORARY REAL UPLOAD TEST
+===================================================== */
 
 async function testRealUpload() {
 
-    const fileInput =
-        document.getElementById("fileInput");
+    const file =
+        fileInput.files[0];
 
 
-    if (!fileInput.files.length) {
+    /* ---------------------------------------------
+       CHECK FILE
+    --------------------------------------------- */
 
-        alert("Please select a PDF or image first.");
+    if (!file) {
+
+        alert(
+            "Please select a PDF or image first."
+        );
 
         return;
 
     }
-
-
-    const file =
-        fileInput.files[0];
 
 
     console.log(
@@ -368,6 +507,10 @@ async function testRealUpload() {
         file.name
     );
 
+
+    /* ---------------------------------------------
+       UPLOAD
+    --------------------------------------------- */
 
     await uploadFileToDrive(file);
 
