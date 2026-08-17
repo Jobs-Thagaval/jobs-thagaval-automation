@@ -79,7 +79,7 @@ fileInput.addEventListener("change", function () {
     previewSection.classList.remove("hidden");
 
     continueButton.disabled = false;
-
+document.getElementById("testUploadButton").disabled = false;
 });
 
 
@@ -338,5 +338,37 @@ async function uploadFileToDrive(file) {
         );
 
     }
+
+}
+// ============================================
+// TEMPORARY REAL UPLOAD TEST
+// ============================================
+
+async function testRealUpload() {
+
+    const fileInput =
+        document.getElementById("fileInput");
+
+
+    if (!fileInput.files.length) {
+
+        alert("Please select a PDF or image first.");
+
+        return;
+
+    }
+
+
+    const file =
+        fileInput.files[0];
+
+
+    console.log(
+        "Testing real upload:",
+        file.name
+    );
+
+
+    await uploadFileToDrive(file);
 
 }
