@@ -339,17 +339,195 @@ function completeStep(stepNumber) {
 
 
 /* =====================================================
-   DOWNLOAD BUTTON
+   DOWNLOAD MP4 BUTTON
 ===================================================== */
 
-downloadButton.addEventListener("click", function () {
+downloadButton.addEventListener("click", async function () {
 
-    alert(
-        "MP4 generation will be connected in a later module."
-    );
+    console.log("=================================");
+    console.log("🎬 DOWNLOAD MP4 CLICKED");
+    console.log("=================================");
+
+    const vidsId = window.generatedVidsId;
+
+    console.log("Vids ID:", vidsId);
+
+    if (!vidsId) {
+
+        alert(
+            "Video is not available yet. Please complete video generation first."
+        );
+
+        return;
+    }
+
+    try {
+
+        downloadButton.disabled = true;
+
+        downloadButton.innerText =
+            "⏳ Preparing MP4...";
+
+
+        console.log(
+            "Requesting MP4 from Apps Script..."
+        );
+
+
+        const response = await fetch(
+            WEB_APP_URL,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "text/plain;charset=utf-8"
+                },
+
+                body: JSON.stringify({
+
+                    action:
+                        "createMP4FromVids",
+
+                    vidsId:
+                        vidsId
+
+                })
+            }
+        );
+
+
+        console.log(
+            "Apps Script HTTP status:",
+            response.status
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Server returned HTTP " +
+                response.status
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "MP4 response:",
+            result
+        );
+
+
+        /* =========================================
+           MP4 READY
+        ========================================= */
+
+        if (
+            result.status === "success" &&
+            result.mp4Url
+        ) {
+
+            console.log(
+                "🎬 MP4 READY!"
+            );
+
+
+            console.log(
+                "MP4 URL:",
+                result.mp4Url
+            );
+
+
+            downloadButton.innerText =
+                "⬇️ Download MP4";
+
+
+            downloadButton.disabled =
+                false;
+
+
+            /*
+             * Open the temporary Google MP4
+             * download URL.
+             */
+
+            window.open(
+                result.mp4Url,
+                "_blank"
+            );
+
+
+            return;
+
+        }
+
+
+        /* =========================================
+           STILL PROCESSING
+        ========================================= */
+
+        if (
+            result.status === "processing"
+        ) {
+
+            downloadButton.disabled =
+                false;
+
+            downloadButton.innerText =
+                "🎬 Generate MP4";
+
+
+            alert(
+                "MP4 is still being prepared. Please wait a little and try again."
+            );
+
+
+            return;
+
+        }
+
+
+        /* =========================================
+           ERROR
+        ========================================= */
+
+        throw new Error(
+
+            result.message ||
+            "MP4 generation failed."
+
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ MP4 download error:",
+            error
+        );
+
+
+        downloadButton.disabled =
+            false;
+
+
+        downloadButton.innerText =
+            "🎬 Download MP4";
+
+
+        alert(
+            "Unable to generate MP4.\n\n" +
+            error.message
+        );
+
+    }
 
 });
-
 
 /* =====================================================
    REAL FILE UPLOAD TO GOOGLE DRIVE
