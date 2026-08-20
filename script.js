@@ -182,6 +182,31 @@ continueButton.addEventListener("click", async function () {
 
         }
 
+        /* -----------------------------------------
+   SAVE GENERATED PRESENTATION DETAILS
+----------------------------------------- */
+
+if (
+    result.data &&
+    result.data.presentationId
+) {
+
+    window.generatedPresentationId =
+        result.data.presentationId;
+
+    window.generatedPresentationUrl =
+        result.data.presentationUrl;
+
+    console.log(
+        "Generated Presentation ID:",
+        window.generatedPresentationId
+    );
+
+    console.log(
+        "Generated Presentation URL:",
+        window.generatedPresentationUrl
+    );
+}
 
         /* -----------------------------------------
            UPLOAD SUCCESSFUL
@@ -418,8 +443,6 @@ downloadButton.addEventListener("click", async function () {
 console.log("Video generation response:", result);
 
 if (result.vidsId) {
-
-    window.generatedVidsId = result.vidsId;
 
     console.log(
         "✅ Google Vids ID stored:",
