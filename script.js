@@ -542,91 +542,157 @@ function completeStep(stepNumber) {
 
 
 /* =====================================================
-   DOWNLOAD MP4 BUTTON
-   GOOGLE SLIDES → TURN INTO VIDEO
+   STEP 8C-3
+   DOWNLOAD MP4
 ===================================================== */
 
-downloadButton.addEventListener("click", function () {
+downloadButton.addEventListener("click", async function () {
 
     console.log("=================================");
-    console.log("🎬 DOWNLOAD MP4 CLICKED");
+    console.log("🎬 STEP 8C-3 - DOWNLOAD MP4");
     console.log("=================================");
 
+    const vidsId = window.generatedVidsId;
 
-    /* -----------------------------------------
-       GET GENERATED PRESENTATION
-    ----------------------------------------- */
+    console.log("Vids ID:", vidsId);
 
-    const presentationId =
-        window.generatedPresentationId ||
-        localStorage.getItem(
-            "generatedPresentationId"
-        );
-
-
-    const presentationUrl =
-        window.generatedPresentationUrl ||
-        localStorage.getItem(
-            "generatedPresentationUrl"
-        );
-
-
-    console.log(
-        "Presentation ID:",
-        presentationId
-    );
-
-    console.log(
-        "Presentation URL:",
-        presentationUrl
-    );
-
-
-    /* -----------------------------------------
-       CHECK PRESENTATION
-    ----------------------------------------- */
-
-    if (!presentationId || !presentationUrl) {
+    if (!vidsId) {
 
         alert(
-            "Google Slides presentation is not available yet."
+            "Please complete 'Turn into video' in Google Slides first."
         );
 
         return;
-
     }
 
+    try {
 
-    /* -----------------------------------------
-       OPEN GOOGLE SLIDES
-    ----------------------------------------- */
+        downloadButton.disabled = true;
 
-    console.log(
-        "Opening generated Google Slides..."
-    );
+        downloadButton.innerText =
+            "⏳ Preparing MP4...";
 
-
-    window.open(
-        presentationUrl,
-        "_blank"
-    );
-
-
-    /* -----------------------------------------
-       USER INSTRUCTION
-    ----------------------------------------- */
-
-    setTimeout(function () {
-
-        alert(
-            "Google Slides opened.\n\n" +
-            "1. Click File → Turn into video\n" +
-            "2. Select all slides\n" +
-            "3. Click Create video\n" +
-            "4. After the video is created, we will download the MP4."
+        console.log(
+            "Requesting MP4 from Apps Script..."
         );
 
-    }, 500);
+        const response = await fetch(
+            WEB_APP_URL,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "text/plain;charset=utf-8"
+                },
+
+                body: JSON.stringify({
+
+                    action:
+                        "createMP4FromVids",
+
+                    vidsId:
+                        vidsId
+
+                })
+            }
+        );
+
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "MP4 response:",
+            result
+        );
+
+
+        if (
+            result.status === "success" &&
+            result.mp4Url
+        ) {
+
+            console.log(
+                "🎬 MP4 READY!"
+            );
+
+            console.log(
+                "MP4 URL:",
+                result.mp4Url
+            );
+
+
+            downloadButton.disabled =
+                false;
+
+            downloadButton.innerText =
+                "⬇️ Download MP4";
+
+
+            /*
+             * Open Google's temporary MP4
+             * download URL.
+             *
+             * MP4 is NOT saved to Drive.
+             */
+
+            window.open(
+                result.mp4Url,
+                "_blank"
+            );
+
+            return;
+        }
+
+
+        if (
+            result.status === "processing"
+        ) {
+
+            downloadButton.disabled =
+                false;
+
+            downloadButton.innerText =
+                "🎬 Download MP4";
+
+
+            alert(
+                "Google is still preparing the video. Please try again shortly."
+            );
+
+            return;
+        }
+
+
+        throw new Error(
+            result.message ||
+            "MP4 generation failed."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ STEP 8C-3 ERROR:",
+            error
+        );
+
+
+        downloadButton.disabled =
+            false;
+
+        downloadButton.innerText =
+            "🎬 Download MP4";
+
+
+        alert(
+            "Unable to download MP4.\n\n" +
+            error.message
+        );
+
+    }
 
 });
 
