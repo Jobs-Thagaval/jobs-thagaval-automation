@@ -351,7 +351,30 @@ continueButton.addEventListener(
 
                 window.generatedPresentationUrl =
                     processingResult.data.presentationUrl;
+                
+/* =====================================
+   SAVE FOR VIDEO CONVERSION
+===================================== */
 
+localStorage.setItem(
+    "generatedPresentationId",
+    processingResult.data.presentationId
+);
+
+localStorage.setItem(
+    "generatedPresentationUrl",
+    processingResult.data.presentationUrl
+);
+
+console.log(
+    "Presentation saved to localStorage."
+);
+
+                window.generatedPresentationId =
+    processingResult.data.presentationId;
+
+window.generatedPresentationUrl =
+    processingResult.data.presentationUrl;
 
                 console.log(
                     "Generated Presentation ID:",
@@ -981,3 +1004,41 @@ async function testRealUpload() {
     await uploadFileToDrive(file);
 
 }
+function loadGeneratedPresentation() {
+
+    const presentationId =
+        localStorage.getItem(
+            "generatedPresentationId"
+        );
+
+    const presentationUrl =
+        localStorage.getItem(
+            "generatedPresentationUrl"
+        );
+
+    if (presentationId) {
+
+        window.generatedPresentationId =
+            presentationId;
+
+        console.log(
+            "Stored Presentation ID:",
+            presentationId
+        );
+
+    }
+
+    if (presentationUrl) {
+
+        window.generatedPresentationUrl =
+            presentationUrl;
+
+        console.log(
+            "Stored Presentation URL:",
+            presentationUrl
+        );
+
+    }
+
+}
+loadGeneratedPresentation();
