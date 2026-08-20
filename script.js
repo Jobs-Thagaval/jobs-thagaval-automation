@@ -128,145 +128,298 @@ fileInput.addEventListener("change", function () {
 
 /* =====================================================
    CONTINUE BUTTON
-   REAL UPLOAD → PROCESSING
+   UPLOAD → OCR → GEMINI → GOOGLE SLIDES
 ===================================================== */
 
-continueButton.addEventListener("click", async function () {
+continueButton.addEventListener(
+    "click",
+    async function () {
 
-    /* ---------------------------------------------
-       CHECK FILE
-    --------------------------------------------- */
-
-    const file = fileInput.files[0];
-
-    if (!file) {
-
-        alert(
-            "Please select a PDF or image first."
-        );
-
-        return;
-
-    }
-
-
-    /* ---------------------------------------------
-       DISABLE BUTTON DURING UPLOAD
-    --------------------------------------------- */
-
-    continueButton.disabled = true;
-
-    continueButton.textContent =
-        "Uploading...";
-
-
-    try {
-
-        /* -----------------------------------------
-           UPLOAD FILE TO GOOGLE DRIVE
-        ----------------------------------------- */
-
-        const result =
-            await uploadFileToDrive(file);
+        const file =
+            fileInput.files[0];
 
 
         /* -----------------------------------------
-           CHECK UPLOAD RESULT
+           CHECK FILE
         ----------------------------------------- */
 
-        if (!result || !result.success) {
+        if (!file) {
 
-            throw new Error(
-                "File upload was not successful."
+            alert(
+                "Please select a PDF or image first."
             );
+
+            return;
 
         }
 
-        /* -----------------------------------------
-   SAVE GENERATED PRESENTATION DETAILS
------------------------------------------ */
 
-if (
-    result.data &&
-    result.data.presentationId
-) {
-
-    window.generatedPresentationId =
-        result.data.presentationId;
-
-    window.generatedPresentationUrl =
-        result.data.presentationUrl;
-
-    console.log(
-        "Generated Presentation ID:",
-        window.generatedPresentationId
-    );
-
-    console.log(
-        "Generated Presentation URL:",
-        window.generatedPresentationUrl
-    );
-}
-
-        /* -----------------------------------------
-           UPLOAD SUCCESSFUL
-        ----------------------------------------- */
-
-        console.log(
-            "Continue upload successful:",
-            result
-        );
-
-
-        /* -----------------------------------------
-           HIDE UPLOAD SECTION
-        ----------------------------------------- */
-
-        uploadSection.classList.add("hidden");
-
-
-        /* -----------------------------------------
-           SHOW PROCESSING SECTION
-        ----------------------------------------- */
-
-        processingSection.classList.remove("hidden");
-
-
-        /* -----------------------------------------
-           START PROCESSING
-        ----------------------------------------- */
-
-        startProcessing();
-
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Continue upload error:",
-            error
-        );
-
-
-        alert(
-            "File upload failed.\n\n" +
-            error.message
-        );
-
-
-        /* -----------------------------------------
-           RESTORE BUTTON
-        ----------------------------------------- */
-
-        continueButton.disabled = false;
+        continueButton.disabled =
+            true;
 
         continueButton.textContent =
-            "Continue →";
+            "Uploading...";
+
+
+        try {
+
+            /* =====================================
+               STEP 1 — UPLOAD FILE
+            ===================================== */
+
+            const uploadResult =
+                await uploadFileToDrive(
+                    file
+                );
+
+
+            if (
+                !uploadResult ||
+                !uploadResult.success
+            ) {
+
+                throw new Error(
+                    "File upload failed."
+                );
+
+            }
+
+
+            console.log(
+                "Upload successful:",
+                uploadResult
+            );
+
+
+            const fileId =
+                uploadResult.data.fileId;
+
+
+            console.log(
+                "Uploaded File ID:",
+                fileId
+            );
+
+
+            if (!fileId) {
+
+                throw new Error(
+                    "Uploaded file ID was not returned."
+                );
+
+            }
+
+
+            /* =====================================
+               STEP 2 — SAVE FILE ID
+            ===================================== */
+
+            window.uploadedFileId =
+                fileId;
+
+
+            /* =====================================
+               STEP 3 — SHOW PROCESSING
+            ===================================== */
+
+            uploadSection.classList.add(
+                "hidden"
+            );
+
+            processingSection.classList.remove(
+                "hidden"
+            );
+
+
+            /* =====================================
+               STEP 4 — START REAL PROCESSING
+            ===================================== */
+
+            console.log(
+                "================================="
+            );
+
+            console.log(
+                "STARTING OCR → GEMINI → PPT"
+            );
+
+            console.log(
+                "================================="
+            );
+
+
+            continueButton.textContent =
+                "Processing...";
+
+
+            const response =
+                await fetch(
+                    APPS_SCRIPT_URL,
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "text/plain;charset=utf-8"
+
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                action:
+                                    "processUploadedNotification",
+
+                                fileId:
+                                    fileId
+
+                            })
+
+                    }
+                );
+
+
+            console.log(
+                "Processing HTTP status:",
+                response.status
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Processing server returned HTTP " +
+                    response.status
+                );
+
+            }
+
+
+            const processingResult =
+                await response.json();
+
+
+            console.log(
+                "================================="
+            );
+
+            console.log(
+                "OCR → GEMINI → PPT RESULT"
+            );
+
+            console.log(
+                "================================="
+            );
+
+            console.log(
+                processingResult
+            );
+
+
+            /* =====================================
+               STEP 5 — PROCESSING SUCCESS
+            ===================================== */
+
+            if (
+                !processingResult.success
+            ) {
+
+                throw new Error(
+
+                    processingResult.message ||
+                    "Notification processing failed."
+
+                );
+
+            }
+
+
+            /* =====================================
+               STEP 6 — SAVE PRESENTATION DETAILS
+            ===================================== */
+
+            if (
+                processingResult.data &&
+                processingResult.data.presentationId
+            ) {
+
+                window.generatedPresentationId =
+                    processingResult.data.presentationId;
+
+
+                window.generatedPresentationUrl =
+                    processingResult.data.presentationUrl;
+
+
+                console.log(
+                    "Generated Presentation ID:",
+                    window.generatedPresentationId
+                );
+
+
+                console.log(
+                    "Generated Presentation URL:",
+                    window.generatedPresentationUrl
+                );
+
+            }
+
+
+            /* =====================================
+               STEP 7 — COMPLETE PROCESSING UI
+            ===================================== */
+
+            console.log(
+                "================================="
+            );
+
+            console.log(
+                "GOOGLE SLIDES GENERATED SUCCESSFULLY"
+            );
+
+            console.log(
+                "================================="
+            );
+
+
+            startProcessing();
+
+
+        } catch (error) {
+
+            console.error(
+                "Processing error:",
+                error
+            );
+
+
+            alert(
+                "Unable to process notification.\n\n" +
+                error.message
+            );
+
+
+            processingSection.classList.add(
+                "hidden"
+            );
+
+            uploadSection.classList.remove(
+                "hidden"
+            );
+
+
+            continueButton.disabled =
+                false;
+
+            continueButton.textContent =
+                "Continue →";
+
+        }
 
     }
-
-});
+);
 
 
 /* =====================================================
