@@ -344,7 +344,10 @@ continueButton.addEventListener(
                 processingResult.data &&
                 processingResult.data.presentationId
             ) {
-
+    /* =====================================
+       SAVE GENERATED GOOGLE SLIDES
+    ===================================== */
+                
                 window.generatedPresentationId =
                     processingResult.data.presentationId;
 
@@ -366,16 +369,10 @@ localStorage.setItem(
     processingResult.data.presentationUrl
 );
 
-console.log(
-    "Presentation saved to localStorage."
-);
-
-                window.generatedPresentationId =
-    processingResult.data.presentationId;
-
-window.generatedPresentationUrl =
-    processingResult.data.presentationUrl;
-
+                   /* =====================================
+       CONSOLE LOG
+    ===================================== */
+                
                 console.log(
                     "Generated Presentation ID:",
                     window.generatedPresentationId
@@ -386,6 +383,11 @@ window.generatedPresentationUrl =
                     "Generated Presentation URL:",
                     window.generatedPresentationUrl
                 );
+
+                console.log(
+    "Presentation saved to localStorage."
+);
+
 
             }
 
