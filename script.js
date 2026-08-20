@@ -415,7 +415,18 @@ downloadButton.addEventListener("click", async function () {
 
         const result =
             await response.json();
+console.log("Video generation response:", result);
 
+if (result.vidsId) {
+
+    window.generatedVidsId = result.vidsId;
+
+    console.log(
+        "✅ Google Vids ID stored:",
+        window.generatedVidsId
+    );
+
+}
 
         console.log(
             "MP4 response:",
