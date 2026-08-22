@@ -606,7 +606,7 @@ downloadButton.addEventListener("click", async function () {
 
         const response =
             await fetch(
-                WEB_APP_URL,
+                APPS_SCRIPT_URL,
                 {
 
                     method:
