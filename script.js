@@ -557,9 +557,10 @@ downloadButton.addEventListener("click", async function () {
     // GET VIDS ID
     // -------------------------------------------------
 
-   const vidsId =
-    window.generatedVidsId ||
-    localStorage.getItem("generatedVidsId");
+    const vidsId =
+        window.generatedVidsId ||
+        localStorage.getItem("generatedVidsId");
+
 
     console.log(
         "Vids ID:",
@@ -587,8 +588,7 @@ downloadButton.addEventListener("click", async function () {
 
     try {
 
-        downloadButton.disabled =
-            true;
+        downloadButton.disabled = true;
 
         downloadButton.innerText =
             "⏳ Preparing MP4...";
@@ -600,7 +600,7 @@ downloadButton.addEventListener("click", async function () {
 
 
         // -------------------------------------------------
-        // SEND REQUEST TO APPS SCRIPT
+        // REQUEST MP4
         // -------------------------------------------------
 
         const response =
@@ -608,8 +608,7 @@ downloadButton.addEventListener("click", async function () {
                 APPS_SCRIPT_URL,
                 {
 
-                    method:
-                        "POST",
+                    method: "POST",
 
                     headers: {
 
@@ -698,10 +697,7 @@ downloadButton.addEventListener("click", async function () {
                 "⬇️ Download MP4";
 
 
-            // -------------------------------------------------
-            // OPEN MP4 DOWNLOAD
-            // -------------------------------------------------
-
+            // Open temporary MP4 download URL
             window.open(
                 result.mp4Url,
                 "_blank"
@@ -728,7 +724,8 @@ downloadButton.addEventListener("click", async function () {
 
 
             alert(
-                "Google Vids is still preparing the MP4. Please wait and try again."
+                "MP4 is still being prepared. " +
+                "Please wait and try again."
             );
 
 
@@ -737,20 +734,18 @@ downloadButton.addEventListener("click", async function () {
 
 
         // -------------------------------------------------
-        // ERROR RESPONSE
+        // SERVER ERROR
         // -------------------------------------------------
 
         throw new Error(
 
             result.message ||
-            "MP4 download failed."
+            "MP4 generation failed."
 
         );
 
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.error(
             "❌ MP4 download error:",
@@ -762,7 +757,7 @@ downloadButton.addEventListener("click", async function () {
             false;
 
         downloadButton.innerText =
-            "⬇️ Download MP4";
+            "🎬 Download MP4";
 
 
         alert(
