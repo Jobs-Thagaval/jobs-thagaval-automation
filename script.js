@@ -254,7 +254,7 @@ continueButton.addEventListener(
 
             const response =
                 await fetch(
-                    APPS_SCRIPT_URL,
+                    WEB_APP_URL,
                     {
 
                         method: "POST",
