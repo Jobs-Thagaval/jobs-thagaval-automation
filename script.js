@@ -1072,3 +1072,70 @@ function loadGeneratedPresentation() {
 
 }
 loadGeneratedPresentation();
+/* =====================================================
+   STEP 8C-4A
+   STORE GOOGLE VIDS ID
+===================================================== */
+
+function storeGeneratedVidsId(vidsUrl) {
+
+    if (!vidsUrl) {
+
+        console.error(
+            "❌ Google Vids URL was not provided."
+        );
+
+        return false;
+    }
+
+
+    const match =
+        vidsUrl.match(
+            /docs\.google\.com\/videos\/d\/([^\/?]+)/
+        );
+
+
+    if (!match) {
+
+        console.error(
+            "❌ Unable to extract Google Vids ID."
+        );
+
+        return false;
+    }
+
+
+    const vidsId =
+        match[1];
+
+
+    window.generatedVidsId =
+        vidsId;
+
+
+    localStorage.setItem(
+        "generatedVidsId",
+        vidsId
+    );
+
+
+    console.log(
+        "================================="
+    );
+
+    console.log(
+        "✅ GOOGLE VIDS ID STORED"
+    );
+
+    console.log(
+        "================================="
+    );
+
+    console.log(
+        "Vids ID:",
+        vidsId
+    );
+
+
+    return true;
+}
