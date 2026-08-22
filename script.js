@@ -557,8 +557,10 @@ downloadButton.addEventListener("click", async function () {
     // GET VIDS ID
     // -------------------------------------------------
 
-    const vidsId =
-        window.generatedVidsId;
+   const vidsId =
+    window.generatedVidsId ||
+    localStorage.getItem("generatedVidsId") ||
+    "1hCp3hfz5j1iEfCvhwo10Mi7vENZVN2oMBDS0lXeEBHA";
 
     console.log(
         "Vids ID:",
