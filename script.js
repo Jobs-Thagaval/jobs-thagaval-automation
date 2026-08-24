@@ -1290,3 +1290,245 @@ function storeGeneratedVidsId(vidsUrl) {
 
     return true;
 }
+/* =====================================================
+   STEP 8C-4F
+   AUTOMATIC GOOGLE VIDS POLLING
+===================================================== */
+
+async function waitForGoogleVids(
+    presentationId,
+    maxAttempts = 30,
+    delayMs = 10000
+) {
+
+    console.log("=================================");
+    console.log("🎬 STEP 8C-4F");
+    console.log("WAITING FOR GOOGLE VIDS");
+    console.log("=================================");
+
+    console.log(
+        "Presentation ID:",
+        presentationId
+    );
+
+    for (
+        let attempt = 1;
+        attempt <= maxAttempts;
+        attempt++
+    ) {
+
+        console.log(
+            `🔎 Vids check ${attempt}/${maxAttempts}`
+        );
+
+        try {
+
+            const response =
+                await fetch(
+                    APPS_SCRIPT_URL,
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "text/plain;charset=utf-8"
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                action:
+                                    "findGoogleVids",
+
+                                presentationId:
+                                    presentationId
+
+                            })
+
+                    }
+                );
+
+
+            console.log(
+                "Vids finder HTTP status:",
+                response.status
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Vids finder returned HTTP " +
+                    response.status
+                );
+
+            }
+
+
+            const result =
+                await response.json();
+
+
+            console.log(
+                "Vids polling result:",
+                result
+            );
+
+
+            /* =========================================
+               VIDS FOUND
+            ========================================= */
+
+            if (
+                result.success === true &&
+                result.status === "ready" &&
+                result.vidsId
+            ) {
+
+                console.log(
+                    "================================="
+                );
+
+                console.log(
+                    "🎬 GOOGLE VIDS FOUND!"
+                );
+
+                console.log(
+                    "================================="
+                );
+
+                console.log(
+                    "Vids ID:",
+                    result.vidsId
+                );
+
+                console.log(
+                    "Vids URL:",
+                    result.vidsUrl
+                );
+
+
+                /* -------------------------------------
+                   SAVE NEW VIDS ID
+                ------------------------------------- */
+
+                window.generatedVidsId =
+                    result.vidsId;
+
+
+                localStorage.setItem(
+                    "generatedVidsId",
+                    result.vidsId
+                );
+
+
+                if (result.vidsUrl) {
+
+                    localStorage.setItem(
+                        "generatedVidsUrl",
+                        result.vidsUrl
+                    );
+
+                }
+
+
+                console.log(
+                    "✅ New Vids ID saved."
+                );
+
+
+                return result;
+
+            }
+
+
+            /* =========================================
+               STILL PROCESSING
+            ========================================= */
+
+            if (
+                result.status === "processing"
+            ) {
+
+                console.log(
+                    "⏳ Google Vids not ready yet."
+                );
+
+                if (
+                    attempt < maxAttempts
+                ) {
+
+                    console.log(
+                        `Waiting ${delayMs / 1000} seconds...`
+                    );
+
+                    await new Promise(
+                        resolve =>
+                            setTimeout(
+                                resolve,
+                                delayMs
+                            )
+                    );
+
+                }
+
+                continue;
+
+            }
+
+
+            /* =========================================
+               UNEXPECTED RESULT
+            ========================================= */
+
+            console.warn(
+                "Unexpected Vids response:",
+                result
+            );
+
+        } catch (error) {
+
+            console.error(
+                "❌ Vids polling error:",
+                error
+            );
+
+        }
+
+
+        if (
+            attempt < maxAttempts
+        ) {
+
+            await new Promise(
+                resolve =>
+                    setTimeout(
+                        resolve,
+                        delayMs
+                    )
+            );
+
+        }
+
+    }
+
+
+    console.error(
+        "❌ Google Vids was not found within the polling period."
+    );
+
+
+    return {
+
+        success: false,
+
+        status: "timeout",
+
+        vidsId: null,
+
+        vidsUrl: null
+
+    };
+
+}
