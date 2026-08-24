@@ -368,10 +368,10 @@ localStorage.setItem(
     "generatedPresentationUrl",
     processingResult.data.presentationUrl
 );
-
-                /* =====================================
+/* =====================================
    STEP 8C-4E
    FIND GOOGLE VIDS AUTOMATICALLY
+   WITH AUTO RETRY
 ===================================== */
 
 console.log(
@@ -387,126 +387,216 @@ console.log(
 );
 
 
+/* =====================================
+   RETRY SETTINGS
+===================================== */
+
+const MAX_VIDS_ATTEMPTS = 30;
+
+const VIDS_RETRY_DELAY = 10000;
+
+
+/* =====================================
+   FIND GOOGLE VIDS WITH RETRY
+===================================== */
+
 try {
 
-    const vidsResponse =
-        await fetch(
-            APPS_SCRIPT_URL,
-            {
+    let vidsFound = false;
 
-                method: "POST",
 
-                headers: {
+    for (
+        let attempt = 1;
+        attempt <= MAX_VIDS_ATTEMPTS;
+        attempt++
+    ) {
 
-                    "Content-Type":
-                        "text/plain;charset=utf-8"
+        console.log(
+            "================================="
+        );
 
-                },
+        console.log(
+            "🎬 GOOGLE VIDS CHECK"
+        );
 
-                body:
-                    JSON.stringify({
+        console.log(
+            "Attempt:",
+            attempt,
+            "of",
+            MAX_VIDS_ATTEMPTS
+        );
 
-                        action:
-                            "getVidsForPresentation",
-
-                        presentationId:
-                            processingResult.data.presentationId
-
-                    })
-
-            }
+        console.log(
+            "================================="
         );
 
 
-    console.log(
-        "Vids finder HTTP status:",
-        vidsResponse.status
-    );
+        const vidsResponse =
+            await fetch(
+                APPS_SCRIPT_URL,
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                "getVidsForPresentation",
+
+                            presentationId:
+                                processingResult.data.presentationId
+
+                        })
+
+                }
+            );
 
 
-    if (!vidsResponse.ok) {
-
-        throw new Error(
-            "Vids finder returned HTTP " +
+        console.log(
+            "Vids finder HTTP status:",
             vidsResponse.status
         );
 
+
+        if (!vidsResponse.ok) {
+
+            throw new Error(
+                "Vids finder returned HTTP " +
+                vidsResponse.status
+            );
+
+        }
+
+
+        const vidsResult =
+            await vidsResponse.json();
+
+
+        console.log(
+            "Google Vids finder result:",
+            vidsResult
+        );
+
+
+        /* =====================================
+           VIDS FOUND
+        ===================================== */
+
+        if (
+            vidsResult.success === true &&
+            vidsResult.status === "ready" &&
+            vidsResult.vidsId
+        ) {
+
+            window.generatedVidsId =
+                vidsResult.vidsId;
+
+
+            localStorage.setItem(
+                "generatedVidsId",
+                vidsResult.vidsId
+            );
+
+
+            window.generatedVidsUrl =
+                vidsResult.vidsUrl;
+
+
+            localStorage.setItem(
+                "generatedVidsUrl",
+                vidsResult.vidsUrl
+            );
+
+
+            console.log(
+                "================================="
+            );
+
+            console.log(
+                "🎉 GOOGLE VIDS FOUND!"
+            );
+
+            console.log(
+                "Vids ID:",
+                window.generatedVidsId
+            );
+
+            console.log(
+                "Vids URL:",
+                window.generatedVidsUrl
+            );
+
+            console.log(
+                "================================="
+            );
+
+
+            vidsFound = true;
+
+            break;
+
+        }
+
+
+        /* =====================================
+           VIDS NOT READY YET
+        ===================================== */
+
+        console.log(
+            "⏳ Google Vids is still processing."
+        );
+
+
+        if (
+            attempt < MAX_VIDS_ATTEMPTS
+        ) {
+
+            console.log(
+                "Waiting 10 seconds before retry..."
+            );
+
+
+            await new Promise(
+                resolve =>
+                    setTimeout(
+                        resolve,
+                        VIDS_RETRY_DELAY
+                    )
+            );
+
+        }
+
     }
-
-
-    const vidsResult =
-        await vidsResponse.json();
-
-
-    console.log(
-        "Google Vids finder result:",
-        vidsResult
-    );
 
 
     /* =====================================
-       VIDS FOUND
+       FINAL RESULT
     ===================================== */
 
-    if (
-        vidsResult.success === true &&
-        vidsResult.status === "ready" &&
-        vidsResult.vidsId
-    ) {
-
-        window.generatedVidsId =
-            vidsResult.vidsId;
-
-
-        localStorage.setItem(
-            "generatedVidsId",
-            vidsResult.vidsId
-        );
-
-
-        window.generatedVidsUrl =
-            vidsResult.vidsUrl;
-
-
-        localStorage.setItem(
-            "generatedVidsUrl",
-            vidsResult.vidsUrl
-        );
-
+    if (!vidsFound) {
 
         console.log(
             "================================="
         );
 
         console.log(
-            "🎬 GOOGLE VIDS FOUND"
+            "⚠️ GOOGLE VIDS NOT FOUND"
         );
 
         console.log(
-            "Vids ID:",
-            window.generatedVidsId
-        );
-
-        console.log(
-            "Vids URL:",
-            window.generatedVidsUrl
+            "Maximum attempts reached."
         );
 
         console.log(
             "================================="
-        );
-
-    }
-
-    else {
-
-        console.log(
-            "Google Vids is not available yet."
-        );
-
-        console.log(
-            "Status:",
-            vidsResult.status
         );
 
     }
