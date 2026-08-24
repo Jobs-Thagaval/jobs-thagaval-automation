@@ -558,7 +558,209 @@ try {
             console.log(
                 "================================="
             );
+/* =====================================================
+   STEP 8C-4F
+   WEBSITE → FIND CORRECT GOOGLE VIDS
+===================================================== */
 
+async function findGoogleVidsForPresentation(
+    presentationId
+) {
+
+    console.log(
+        "================================="
+    );
+
+    console.log(
+        "🎬 STEP 8C-4F - FIND GOOGLE VIDS"
+    );
+
+    console.log(
+        "================================="
+    );
+
+    console.log(
+        "Presentation ID:",
+        presentationId
+    );
+
+
+    if (!presentationId) {
+
+        console.error(
+            "❌ Presentation ID is missing."
+        );
+
+        return {
+            success: false,
+            status: "error",
+            message: "Presentation ID is missing."
+        };
+
+    }
+
+
+    try {
+
+        console.log(
+            "Requesting Google Vids from Apps Script..."
+        );
+
+
+        const response =
+            await fetch(
+                APPS_SCRIPT_URL,
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                "findGoogleVidsForPresentation",
+
+                            presentationId:
+                                presentationId
+
+                        })
+
+                }
+            );
+
+
+        console.log(
+            "Vids finder HTTP status:",
+            response.status
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Apps Script returned HTTP " +
+                response.status
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "Google Vids finder result:",
+            result
+        );
+
+
+        /* =========================================
+           VIDS FOUND
+        ========================================= */
+
+        if (
+            result.success === true &&
+            result.vidsId
+        ) {
+
+            window.generatedVidsId =
+                result.vidsId;
+
+            window.generatedVidsUrl =
+                result.vidsUrl || "";
+
+
+            localStorage.setItem(
+                "generatedVidsId",
+                result.vidsId
+            );
+
+
+            if (result.vidsUrl) {
+
+                localStorage.setItem(
+                    "generatedVidsUrl",
+                    result.vidsUrl
+                );
+
+            }
+
+
+            console.log(
+                "================================="
+            );
+
+            console.log(
+                "🎬 GOOGLE VIDS FOUND!"
+            );
+
+            console.log(
+                "Vids ID:",
+                window.generatedVidsId
+            );
+
+            console.log(
+                "Vids URL:",
+                window.generatedVidsUrl
+            );
+
+            console.log(
+                "================================="
+            );
+
+
+            return result;
+
+        }
+
+
+        /* =========================================
+           VIDS STILL PROCESSING
+        ========================================= */
+
+        console.log(
+            "Google Vids is not available yet."
+        );
+
+        console.log(
+            "Status:",
+            result.status
+        );
+
+
+        return result;
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Google Vids finder error:",
+            error
+        );
+
+
+        return {
+
+            success: false,
+
+            status: "error",
+
+            message:
+                error.message
+
+        };
+
+    }
+
+}
 
             startProcessing();
 
