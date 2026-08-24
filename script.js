@@ -515,6 +515,11 @@ for (
                 vidsResult
             );
 
+            console.log(
+  "🔎 FULL VIDS FINDER RESPONSE:",
+  JSON.stringify(result, null, 2)
+);
+
 
             // =====================================
             // CORRECT VIDS FOUND
