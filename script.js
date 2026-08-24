@@ -400,8 +400,7 @@ localStorage.setItem(
 );
 /* =====================================
    STEP 8C-4E
-   FIND GOOGLE VIDS AUTOMATICALLY
-   WITH AUTO RETRY
+   WAIT FOR CORRECT GOOGLE VIDS
 ===================================== */
 
 console.log(
@@ -409,7 +408,7 @@ console.log(
 );
 
 console.log(
-    "🎬 STEP 8C-4E - FIND GOOGLE VIDS"
+    "🎬 STEP 8C-4E - WAIT FOR GOOGLE VIDS"
 );
 
 console.log(
@@ -417,56 +416,58 @@ console.log(
 );
 
 
-/* =====================================
-   RETRY SETTINGS
-===================================== */
+// =====================================
+// CURRENT PRESENTATION
+// =====================================
 
-const MAX_VIDS_ATTEMPTS = 30;
-
-const VIDS_RETRY_DELAY = 10000;
-
-
-/* =====================================
-   FIND GOOGLE VIDS WITH RETRY
-===================================== */
-
-try {
-
-    let vidsFound = false;
+const currentPresentationId =
+    processingResult.data.presentationId;
 
 
-    for (
-        let attempt = 1;
-        attempt <= MAX_VIDS_ATTEMPTS;
-        attempt++
-    ) {
+console.log(
+    "Current Presentation ID:",
+    currentPresentationId
+);
 
-        console.log(
-            "================================="
-        );
 
-        console.log(
-            "🎬 GOOGLE VIDS CHECK"
-        );
+// =====================================
+// POLLING SETTINGS
+// =====================================
 
-        console.log(
-            "Attempt:",
-            attempt,
-            "of",
-            MAX_VIDS_ATTEMPTS
-        );
+const MAX_VIDS_ATTEMPTS = 18;
 
-        console.log(
-            "================================="
-        );
+const VIDS_WAIT_TIME = 5000;
 
+let currentVidsResult = null;
+
+
+// =====================================
+// CHECK GOOGLE VIDS
+// =====================================
+
+for (
+    let attempt = 1;
+    attempt <= MAX_VIDS_ATTEMPTS;
+    attempt++
+) {
+
+    console.log(
+        "🎬 Checking Google Vids... Attempt " +
+        attempt +
+        "/" +
+        MAX_VIDS_ATTEMPTS
+    );
+
+
+    try {
 
         const vidsResponse =
             await fetch(
                 APPS_SCRIPT_URL,
                 {
 
-                    method: "POST",
+                    method:
+                        "POST",
 
                     headers: {
 
@@ -482,7 +483,7 @@ try {
                                 "getVidsForPresentation",
 
                             presentationId:
-                                processingResult.data.presentationId
+                                currentPresentationId
 
                         })
 
@@ -498,145 +499,149 @@ try {
 
         if (!vidsResponse.ok) {
 
-            throw new Error(
-                "Vids finder returned HTTP " +
+            console.warn(
+                "Vids finder returned HTTP status:",
                 vidsResponse.status
             );
 
-        }
+        } else {
+
+            const vidsResult =
+                await vidsResponse.json();
 
 
-        const vidsResult =
-            await vidsResponse.json();
+            console.log(
+                "Google Vids finder result:",
+                vidsResult
+            );
 
 
-        console.log(
-            "Google Vids finder result:",
-            vidsResult
-        );
+            // =====================================
+            // CORRECT VIDS FOUND
+            // =====================================
 
-
-        /* =====================================
-           VIDS FOUND
-        ===================================== */
-
-        if (
-            vidsResult.success === true &&
-            vidsResult.status === "ready" &&
-            vidsResult.vidsId
-        ) {
-
-            window.generatedVidsId =
-                vidsResult.vidsId;
-
-
-            localStorage.setItem(
-                "generatedVidsId",
+            if (
+                vidsResult.success === true &&
+                vidsResult.status === "ready" &&
                 vidsResult.vidsId
-            );
+            ) {
+
+                currentVidsResult =
+                    vidsResult;
 
 
-            window.generatedVidsUrl =
-                vidsResult.vidsUrl;
+                window.generatedVidsId =
+                    vidsResult.vidsId;
 
 
-            localStorage.setItem(
-                "generatedVidsUrl",
-                vidsResult.vidsUrl
-            );
+                window.generatedVidsUrl =
+                    vidsResult.vidsUrl;
 
 
-            console.log(
-                "================================="
-            );
-
-            console.log(
-                "🎉 GOOGLE VIDS FOUND!"
-            );
-
-            console.log(
-                "Vids ID:",
-                window.generatedVidsId
-            );
-
-            console.log(
-                "Vids URL:",
-                window.generatedVidsUrl
-            );
-
-            console.log(
-                "================================="
-            );
+                localStorage.setItem(
+                    "generatedVidsId",
+                    vidsResult.vidsId
+                );
 
 
-            vidsFound = true;
-
-            break;
-
-        }
-
-
-        /* =====================================
-           VIDS NOT READY YET
-        ===================================== */
-
-        console.log(
-            "⏳ Google Vids is still processing."
-        );
+                localStorage.setItem(
+                    "generatedVidsUrl",
+                    vidsResult.vidsUrl
+                );
 
 
-        if (
-            attempt < MAX_VIDS_ATTEMPTS
-        ) {
+                console.log(
+                    "================================="
+                );
 
-            console.log(
-                "Waiting 10 seconds before retry..."
-            );
+                console.log(
+                    "🎬 CORRECT GOOGLE VIDS FOUND!"
+                );
+
+                console.log(
+                    "Vids ID:",
+                    vidsResult.vidsId
+                );
+
+                console.log(
+                    "Vids URL:",
+                    vidsResult.vidsUrl
+                );
+
+                console.log(
+                    "================================="
+                );
 
 
-            await new Promise(
-                resolve =>
-                    setTimeout(
-                        resolve,
-                        VIDS_RETRY_DELAY
-                    )
-            );
+                // Stop checking
+                break;
+
+            }
 
         }
 
-    }
+    } catch (vidsError) {
 
-
-    /* =====================================
-       FINAL RESULT
-    ===================================== */
-
-    if (!vidsFound) {
-
-        console.log(
-            "================================="
-        );
-
-        console.log(
-            "⚠️ GOOGLE VIDS NOT FOUND"
-        );
-
-        console.log(
-            "Maximum attempts reached."
-        );
-
-        console.log(
-            "================================="
+        console.warn(
+            "Google Vids search attempt failed:",
+            vidsError
         );
 
     }
 
 
-} catch (vidsError) {
+    // =====================================
+    // WAIT BEFORE NEXT ATTEMPT
+    // =====================================
 
-    console.error(
-        "Google Vids finder error:",
-        vidsError
+    if (
+        attempt <
+        MAX_VIDS_ATTEMPTS
+    ) {
+
+        console.log(
+            "⏳ Google Vids not ready yet."
+        );
+
+        console.log(
+            "Waiting 5 seconds before next check..."
+        );
+
+
+        await new Promise(
+            function (resolve) {
+
+                setTimeout(
+                    resolve,
+                    VIDS_WAIT_TIME
+                );
+
+            }
+        );
+
+    }
+
+}
+
+
+// =====================================
+// FINAL RESULT
+// =====================================
+
+if (currentVidsResult) {
+
+    console.log(
+        "🎬 Current notification Vids successfully connected."
+    );
+
+} else {
+
+    console.log(
+        "⚠️ Google Vids is still processing after all attempts."
+    );
+
+    console.log(
+        "The MP4 download can be attempted later."
     );
 
 }
