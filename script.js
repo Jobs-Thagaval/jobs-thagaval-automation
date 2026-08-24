@@ -517,7 +517,7 @@ for (
 
             console.log(
   "🔎 FULL VIDS FINDER RESPONSE:",
-  JSON.stringify(result, null, 2)
+  JSON.stringify(vidsResult, null, 2)
 );
 
 
