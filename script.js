@@ -38,6 +38,22 @@ const APPS_SCRIPT_URL =
 
 
 /* =====================================================
+   STEP 8C-4E
+   CLEAR PREVIOUS GOOGLE VIDS DATA
+===================================================== */
+
+window.generatedVidsId = null;
+window.generatedVidsUrl = null;
+
+localStorage.removeItem("generatedVidsId");
+localStorage.removeItem("generatedVidsUrl");
+
+console.log(
+    "🧹 Previous Google Vids data cleared."
+);
+
+
+/* =====================================================
    FILE SELECTION
 ===================================================== */
 
@@ -160,6 +176,20 @@ continueButton.addEventListener(
         continueButton.textContent =
             "Uploading...";
 
+        /* =====================================================
+   STEP 8C-4E
+   CLEAR PREVIOUS GOOGLE VIDS DATA
+===================================================== */
+
+window.generatedVidsId = null;
+window.generatedVidsUrl = null;
+
+localStorage.removeItem("generatedVidsId");
+localStorage.removeItem("generatedVidsUrl");
+
+console.log(
+    "🧹 Previous Google Vids data cleared."
+);
 
         try {
 
