@@ -463,200 +463,86 @@ let currentVidsResult = null;
 
 
 // =====================================
-// CHECK GOOGLE VIDS
+// STEP 4 — CONVERT PRESENTATION TO VIDEO
 // =====================================
 
-for (
-    let attempt = 1;
-    attempt <= MAX_VIDS_ATTEMPTS;
-    attempt++
-) {
+console.log("=================================");
+console.log("🎬 STEP 4 - CONVERT PRESENTATION TO VIDEO");
+console.log("=================================");
 
-    console.log(
-        "🎬 Checking Google Vids... Attempt " +
-        attempt +
-        "/" +
-        MAX_VIDS_ATTEMPTS
-    );
+console.log(
+    "Google Slides is ready."
+);
 
-
-    try {
-
-        const vidsResponse =
-            await fetch(
-                APPS_SCRIPT_URL,
-                {
-
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "text/plain;charset=utf-8"
-
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            action:
-                                "getVidsForPresentation",
-
-                            presentationId:
-                                currentPresentationId
-
-                        })
-
-                }
-            );
-
-
-        console.log(
-            "Vids finder HTTP status:",
-            vidsResponse.status
-        );
-
-
-        if (!vidsResponse.ok) {
-
-            console.warn(
-                "Vids finder returned HTTP status:",
-                vidsResponse.status
-            );
-
-        } else {
-
-            const vidsResult =
-                await vidsResponse.json();
-
-
-            console.log(
-                "Google Vids finder result:",
-                vidsResult
-            );
-
-            console.log(
-  "🔎 FULL VIDS FINDER RESPONSE:",
-  JSON.stringify(vidsResult, null, 2)
+console.log(
+    "Presentation URL:",
+    processingResult.data.presentationUrl
 );
 
 
-            // =====================================
-            // CORRECT VIDS FOUND
-            // =====================================
+// =====================================
+// STEP 4 ACTIVE
+// =====================================
 
-            if (
-                vidsResult.success === true &&
-                vidsResult.status === "ready" &&
-                vidsResult.vidsId
-            ) {
-
-                   // =====================================
-    // STEP 4 COMPLETE
-    // GOOGLE VIDS FOUND
-    // =====================================
-
-    completeStep(4);
-                activateStep(5);
-                
-                currentVidsResult =
-                    vidsResult;
+activateStep(4);
 
 
-                window.generatedVidsId =
-                    vidsResult.vidsId;
+// =====================================
+// SAVE PRESENTATION DETAILS
+// =====================================
+
+const presentationUrl =
+    processingResult.data.presentationUrl;
+
+const presentationId =
+    processingResult.data.presentationId;
 
 
-                window.generatedVidsUrl =
-                    vidsResult.vidsUrl;
+// =====================================
+// SHOW PRESENTATION LINK
+// =====================================
+
+window.generatedPresentationId =
+    presentationId;
+
+window.generatedPresentationUrl =
+    presentationUrl;
+
+localStorage.setItem(
+    "generatedPresentationId",
+    presentationId
+);
+
+localStorage.setItem(
+    "generatedPresentationUrl",
+    presentationUrl
+);
 
 
-                localStorage.setItem(
-                    "generatedVidsId",
-                    vidsResult.vidsId
-                );
+// =====================================
+// SHOW STEP 4 INSTRUCTION
+// =====================================
+
+console.log(
+    "🎬 STEP 4 READY"
+);
+
+console.log(
+    "Open Google Slides and select:"
+);
+
+console.log(
+    "File → Convert to video"
+);
 
 
-                localStorage.setItem(
-                    "generatedVidsUrl",
-                    vidsResult.vidsUrl
-                );
+// =====================================
+// STEP 4 COMPLETE FOR NOW
+// =====================================
 
+completeStep(4);
 
-                console.log(
-                    "================================="
-                );
-
-                console.log(
-                    "🎬 CORRECT GOOGLE VIDS FOUND!"
-                );
-
-                console.log(
-                    "Vids ID:",
-                    vidsResult.vidsId
-                );
-
-                console.log(
-                    "Vids URL:",
-                    vidsResult.vidsUrl
-                );
-
-                console.log(
-                    "================================="
-                );
-
-
-                // Stop checking
-                break;
-
-            }
-
-        }
-
-    } catch (vidsError) {
-
-        console.warn(
-            "Google Vids search attempt failed:",
-            vidsError
-        );
-
-    }
-
-
-    // =====================================
-    // WAIT BEFORE NEXT ATTEMPT
-    // =====================================
-
-    if (
-        attempt <
-        MAX_VIDS_ATTEMPTS
-    ) {
-
-        console.log(
-            "⏳ Google Vids not ready yet."
-        );
-
-        console.log(
-            "Waiting 5 seconds before next check..."
-        );
-
-
-        await new Promise(
-            function (resolve) {
-
-                setTimeout(
-                    resolve,
-                    VIDS_WAIT_TIME
-                );
-
-            }
-        );
-
-    }
-
-}
-
+activateStep(5);
 
 // =====================================
 // FINAL RESULT
