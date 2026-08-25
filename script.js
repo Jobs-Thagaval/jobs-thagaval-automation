@@ -552,6 +552,13 @@ for (
                 vidsResult.vidsId
             ) {
 
+                   // =====================================
+    // STEP 4 COMPLETE
+    // GOOGLE VIDS FOUND
+    // =====================================
+
+    completeStep(4);
+                
                 currentVidsResult =
                     vidsResult;
 
