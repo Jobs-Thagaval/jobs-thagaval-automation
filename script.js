@@ -558,6 +558,7 @@ for (
     // =====================================
 
     completeStep(4);
+                activateStep(5);
                 
                 currentVidsResult =
                     vidsResult;
