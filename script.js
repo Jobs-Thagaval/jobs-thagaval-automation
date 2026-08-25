@@ -418,24 +418,7 @@ localStorage.setItem(
     "generatedPresentationUrl",
     processingResult.data.presentationUrl
 );
-
-/* =====================================
-   STEP 8C-4E
-   WAIT FOR CORRECT GOOGLE VIDS
-===================================== */
-
-console.log(
-    "================================="
-);
-
-console.log(
-    "🎬 STEP 8C-4E - WAIT FOR GOOGLE VIDS"
-);
-
-console.log(
-    "================================="
-);
-                
+      
 activateStep(4);
 
 // =====================================
