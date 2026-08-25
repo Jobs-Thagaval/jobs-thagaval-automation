@@ -358,13 +358,13 @@ if (processingResult.success) {
     );
 
     // Reading Notification
-    completeStep("readingNotification");
+    completeStep(1);
 
     // Extracting Job Details
-    completeStep("extractingJobDetails");
+    completeStep(2);
 
     // Creating Job Presentation
-    completeStep("creatingPresentation");
+    completeStep(3);
 
 }
 
