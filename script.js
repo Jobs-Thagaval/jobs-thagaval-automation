@@ -951,55 +951,16 @@ async function findGoogleVidsForPresentation(
 
 
 /* =====================================================
-   PROCESSING SIMULATION
+   PROCESSING STATUS
 ===================================================== */
 
 function startProcessing() {
 
+    console.log(
+        "▶️ Processing started"
+    );
+
     activateStep(1);
-
-
-    setTimeout(function () {
-
-        completeStep(1);
-
-        activateStep(2);
-
-    }, 2000);
-
-
-    setTimeout(function () {
-
-        completeStep(2);
-
-        activateStep(3);
-
-    }, 4000);
-
-
-    setTimeout(function () {
-
-        completeStep(3);
-
-        activateStep(4);
-
-        downloadSection.classList.remove("hidden");
-
-    }, 6000);
-
-
-    setTimeout(function () {
-
-        completeStep(4);
-
-    }, 9000);
-
-
-    setTimeout(function () {
-
-        completeStep(5);
-
-    }, 11000);
 
 }
 
