@@ -347,6 +347,26 @@ console.log(
                 processingResult
             );
 
+            // =====================================
+// MARK BACKEND PROCESSING COMPLETE
+// =====================================
+
+if (processingResult.success) {
+
+    console.log(
+        "✅ OCR + GEMINI + GOOGLE SLIDES COMPLETED"
+    );
+
+    // Reading Notification
+    markStepComplete("readingNotification");
+
+    // Extracting Job Details
+    markStepComplete("extractingJobDetails");
+
+    // Creating Job Presentation
+    markStepComplete("creatingPresentation");
+
+}
 
             /* =====================================
                STEP 5 — PROCESSING SUCCESS
