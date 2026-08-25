@@ -434,7 +434,8 @@ console.log(
 console.log(
     "================================="
 );
-
+                
+activateStep(4);
 
 // =====================================
 // CURRENT PRESENTATION
