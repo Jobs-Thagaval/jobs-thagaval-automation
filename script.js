@@ -1635,8 +1635,8 @@ function storeGeneratedVidsId(vidsUrl) {
 
 async function waitForGoogleVids(
     presentationId,
-    maxAttempts = 30,
-    delayMs = 10000
+    maxAttempts = 24,
+    delayMs = 5000
 ) {
 
     console.log("=================================");
