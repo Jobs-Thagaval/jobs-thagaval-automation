@@ -418,30 +418,7 @@ localStorage.setItem(
     "generatedPresentationUrl",
     processingResult.data.presentationUrl
 );
-                
-// =====================================
-// STEP 4 — SET PRESENTATION BUTTON
-// =====================================
 
-const openPresentationButton =
-    document.getElementById(
-        "openPresentationButton"
-    );
-
-if (
-    openPresentationButton &&
-    presentationUrl
-) {
-
-    openPresentationButton.href =
-        presentationUrl;
-
-    console.log(
-        "🎬 Step 4 presentation button ready:",
-        presentationUrl
-    );
-
-}
 /* =====================================
    STEP 8C-4E
    WAIT FOR CORRECT GOOGLE VIDS
@@ -542,6 +519,29 @@ localStorage.setItem(
     presentationUrl
 );
 
+                // =====================================
+// STEP 4 — SET PRESENTATION BUTTON
+// =====================================
+
+const openPresentationButton =
+    document.getElementById(
+        "openPresentationButton"
+    );
+
+if (
+    openPresentationButton &&
+    presentationUrl
+) {
+
+    openPresentationButton.href =
+        presentationUrl;
+
+    console.log(
+        "🎬 Step 4 presentation button ready:",
+        presentationUrl
+    );
+
+}
 
 // =====================================
 // SHOW STEP 4 INSTRUCTION
