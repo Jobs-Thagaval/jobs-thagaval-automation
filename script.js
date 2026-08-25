@@ -976,8 +976,23 @@ function activateStep(stepNumber) {
             "step" + stepNumber
         );
 
-    step.classList.add("active");
+    console.log(
+        "ACTIVATE STEP:",
+        stepNumber,
+        step
+    );
 
+    if (!step) {
+
+        console.error(
+            "❌ STEP ELEMENT NOT FOUND: step" +
+            stepNumber
+        );
+
+        return;
+    }
+
+    step.classList.add("active");
 }
 
 
@@ -992,15 +1007,25 @@ function completeStep(stepNumber) {
             "step" + stepNumber
         );
 
+    console.log(
+        "COMPLETE STEP:",
+        stepNumber,
+        step
+    );
+
+    if (!step) {
+
+        console.error(
+            "❌ STEP ELEMENT NOT FOUND: step" +
+            stepNumber
+        );
+
+        return;
+    }
+
     step.classList.remove("active");
 
     step.classList.add("completed");
-
-
-    const icon =
-        step.querySelector(".status-icon");
-
-    icon.textContent = "✓";
 
 }
 
