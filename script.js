@@ -434,7 +434,7 @@ console.log(
 // POLLING SETTINGS
 // =====================================
 
-const MAX_VIDS_ATTEMPTS = 120;
+const MAX_VIDS_ATTEMPTS = 1;
 
 const VIDS_WAIT_TIME = 5000;
 
