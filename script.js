@@ -302,27 +302,143 @@ continueButton.addEventListener(
             );
 
 
-          if (!response.ok) {
+ if (!response.ok) {
 
-    console.error(
-        "❌ Processing request returned HTTP:",
+    console.warn(
+        "⚠️ Processing request returned HTTP:",
         response.status
     );
 
-    console.error(
-        "The Apps Script execution may have completed even though the browser received an error."
-    );
 
-    throw new Error(
-        "Processing server returned HTTP " +
-        response.status +
-        ". Please check Apps Script Executions."
-    );
+    // =========================================
+    // TRY TO RECOVER COMPLETED RESULT
+    // =========================================
+
+    if (response.status === 404) {
+
+        console.log(
+            "🔄 Attempting to recover completed processing result..."
+        );
+
+
+        // Wait briefly because Apps Script may
+        // have completed just before the 404.
+        await new Promise(
+            function (resolve) {
+
+                setTimeout(
+                    resolve,
+                    3000
+                );
+
+            }
+        );
+
+
+        const recoveryResponse =
+            await fetch(
+                APPS_SCRIPT_URL,
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                "getProcessingResult",
+
+                            fileId:
+                                fileId
+
+                        })
+
+                }
+            );
+
+
+        console.log(
+            "Recovery HTTP status:",
+            recoveryResponse.status
+        );
+
+
+        if (
+            recoveryResponse.ok
+        ) {
+
+            const recoveredResult =
+                await recoveryResponse.json();
+
+
+            console.log(
+                "Recovered processing result:",
+                recoveredResult
+            );
+
+
+            if (
+                recoveredResult.success === true
+            ) {
+
+                console.log(
+                    "✅ Processing result successfully recovered."
+                );
+
+
+                // Use recovered result exactly
+                // like the original response.
+                processingResult =
+                    recoveredResult;
+
+            } else {
+
+                throw new Error(
+                    recoveredResult.message ||
+                    "Processing result could not be recovered."
+                );
+
+            }
+
+        } else {
+
+            throw new Error(
+                "Processing server returned HTTP " +
+                response.status +
+                " and recovery also failed with HTTP " +
+                recoveryResponse.status
+            );
+
+        }
+
+    } else {
+
+        throw new Error(
+            "Processing server returned HTTP " +
+            response.status
+        );
+
+    }
+
+} else {
+
+    // =========================================
+    // NORMAL RESPONSE
+    // =========================================
+
+    processingResult =
+        await response.json();
 
 }
-
-            const processingResult =
-                await response.json();
+            
+let processingResult;
 
 
             console.log(
