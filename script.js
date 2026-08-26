@@ -302,15 +302,24 @@ continueButton.addEventListener(
             );
 
 
-            if (!response.ok) {
+          if (!response.ok) {
 
-                throw new Error(
-                    "Processing server returned HTTP " +
-                    response.status
-                );
+    console.error(
+        "❌ Processing request returned HTTP:",
+        response.status
+    );
 
-            }
+    console.error(
+        "The Apps Script execution may have completed even though the browser received an error."
+    );
 
+    throw new Error(
+        "Processing server returned HTTP " +
+        response.status +
+        ". Please check Apps Script Executions."
+    );
+
+}
 
             const processingResult =
                 await response.json();
