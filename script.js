@@ -1363,10 +1363,35 @@ async function uploadFileToDrive(file) {
         /* ---------------------------------------------
            CONVERT RESPONSE TO JSON
         --------------------------------------------- */
+let data;
 
-        const data =
-            JSON.parse(result);
+try {
 
+    data =
+        JSON.parse(result);
+
+} catch (jsonError) {
+
+    console.error(
+        "❌ Apps Script did not return valid JSON."
+    );
+
+    console.error(
+        "HTTP status:",
+        response.status
+    );
+
+    console.error(
+        "Raw response:",
+        result
+    );
+
+    throw new Error(
+        "Apps Script upload response was not valid JSON. HTTP " +
+        response.status
+    );
+
+}
 
         /* ---------------------------------------------
            CHECK RESULT
