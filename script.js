@@ -1330,7 +1330,7 @@ async function uploadFileToDrive(file) {
 
                     method: "POST",
 
-                    redirect: "manual",
+                    redirect: "follow",
 
                     headers: {
 
