@@ -38,8 +38,8 @@ const APPS_SCRIPT_URL =
 
 
 /* =====================================================
-   STEP 8C-4E
-   CLEAR PREVIOUS GOOGLE VIDS DATA
+   STEP 4
+   CLEAR PREVIOUS VIDEO DATA
 ===================================================== */
 
 window.generatedVidsId = null;
@@ -49,7 +49,7 @@ localStorage.removeItem("generatedVidsId");
 localStorage.removeItem("generatedVidsUrl");
 
 console.log(
-    "🧹 Previous Google Vids data cleared."
+    "🧹 Previous video data cleared."
 );
 
 
