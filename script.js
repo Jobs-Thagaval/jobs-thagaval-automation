@@ -644,26 +644,16 @@ completeStep(4);
 activateStep(5);
 
 // =====================================
-// FINAL RESULT
+// WAITING FOR GOOGLE VIDS
 // =====================================
 
-if (currentVidsResult) {
+console.log(
+    "⏳ Waiting for Google Vids creation."
+);
 
-    console.log(
-        "🎬 Current notification Vids successfully connected."
-    );
-
-} else {
-
-    console.log(
-        "⚠️ Google Vids is still processing after all attempts."
-    );
-
-    console.log(
-        "The MP4 download can be attempted later."
-    );
-
-}
+console.log(
+    "Presentation is ready for video conversion."
+);
                    /* =====================================
        CONSOLE LOG
     ===================================== */
