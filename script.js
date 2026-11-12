@@ -635,13 +635,13 @@ console.log(
 );
 
 
-// =====================================
 // STEP 4 COMPLETE FOR NOW
-// =====================================
 
 completeStep(4);
 
-activateStep(5);
+console.log(
+    "Waiting for Google Vids creation."
+);
 
 // =====================================
 // WAITING FOR GOOGLE VIDS
