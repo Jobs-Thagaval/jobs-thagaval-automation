@@ -302,8 +302,7 @@ continueButton.addEventListener(
                 "Processing HTTP status:",
                 response.status
             );
-// Declare before any assignment or use
-let processingResult = null;
+let processingResult;
 
  if (!response.ok) {
 
@@ -442,19 +441,11 @@ let processingResult = null;
 }
             
 
-
-
-            console.log(
-                "================================="
-            );
-
             console.log(
                 "OCR → GEMINI → PPT RESULT"
             );
 
-            console.log(
-                "================================="
-            );
+        
 
             console.log(
                 processingResult
