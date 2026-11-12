@@ -267,6 +267,8 @@ continueButton.addEventListener(
                 "Processing...";
 
 
+            
+            
             const response =
                 await fetch(
                     APPS_SCRIPT_URL,
@@ -300,7 +302,8 @@ continueButton.addEventListener(
                 "Processing HTTP status:",
                 response.status
             );
-
+// Declare before any assignment or use
+let processingResult = null;
 
  if (!response.ok) {
 
@@ -438,7 +441,7 @@ continueButton.addEventListener(
 
 }
             
-let processingResult;
+
 
 
             console.log(
